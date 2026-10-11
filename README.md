@@ -1,2 +1,47 @@
-# Plante-
+name: Construire Opération Planète APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Installer Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Installer Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Installer les outils Android
+        run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Extraire le projet
+        run: |
+          unzip OperationPlaneteAndroid.zip -d projet
+          find projet -name settings.gradle.kts
+
+      - name: Compiler l'application
+        run: |
+          cd projet/OperationPlaneteAndroid
+          gradle assembleDebug
+
+      - name: Publier l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: OperationPlanete-debug-apk
+          path: projet/**/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error# Plante-
 Jeux de stratégie Android opération planète
